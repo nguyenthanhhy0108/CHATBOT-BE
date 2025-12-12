@@ -1,5 +1,6 @@
 package com.example.be.model.entity;
 
+import com.example.be.model.standard.BaseAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

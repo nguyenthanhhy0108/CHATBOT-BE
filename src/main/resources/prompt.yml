@@ -1,0 +1,6 @@
+chat-session:
+  title-name-prompt: |
+    Generate a short, clear, and context-accurate title for this chat based on the first user message.
+    The title should be concise (3–6 words), in English, and describe the main intent or topic.
+    Do not include punctuation or quotes.
+    First message: {FIRST_MESSAGE}

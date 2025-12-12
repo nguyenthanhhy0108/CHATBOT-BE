@@ -10,6 +10,8 @@ public class BeApplication {
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.load();
 
+		System.setProperty("OPENAI_API_KEY", getEnv("OPENAI_API_KEY", dotenv));
+
 		System.setProperty("POSTGRES_URL", getEnv("POSTGRES_URL", dotenv));
 		System.setProperty("POSTGRES_USER", getEnv("POSTGRES_USER", dotenv));
 		System.setProperty("POSTGRES_PASSWORD", getEnv("POSTGRES_PASSWORD", dotenv));

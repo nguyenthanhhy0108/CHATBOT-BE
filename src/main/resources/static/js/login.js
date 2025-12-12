@@ -1,5 +1,41 @@
 // src/main/resources/static/js/login.js
 
+// Hide skeleton loading after page loads
+window.addEventListener('load', function() {
+    const skeleton = document.getElementById('skeletonOverlay');
+    const formSide = document.querySelector('.form-side');
+    const heroSide = document.querySelector('.hero-side');
+
+    // Minimum loading time for better UX
+    setTimeout(() => {
+        if (skeleton) {
+            skeleton.classList.add('hidden');
+            setTimeout(() => skeleton.style.display = 'none', 400);
+        }
+    }, 800);
+
+    // Animate content on load
+    if (formSide) {
+        formSide.style.opacity = '0';
+        formSide.style.transform = 'translateX(20px)';
+
+        setTimeout(() => {
+            formSide.style.transition = 'all 0.6s ease-out';
+            formSide.style.opacity = '1';
+            formSide.style.transform = 'translateX(0)';
+        }, 900);
+    }
+
+    if (heroSide) {
+        heroSide.style.opacity = '0';
+
+        setTimeout(() => {
+            heroSide.style.transition = 'opacity 0.8s ease-out';
+            heroSide.style.opacity = '1';
+        }, 850);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const usernameInput = document.querySelector('input[name="username"]');
@@ -135,29 +171,3 @@ function removeMessages() {
     const messages = document.querySelectorAll('.error-message, .success-message');
     messages.forEach(msg => msg.remove());
 }
-
-// Add smooth animations on page load
-window.addEventListener('load', function() {
-    const formSide = document.querySelector('.form-side');
-    const heroSide = document.querySelector('.hero-side');
-
-    if (formSide) {
-        formSide.style.opacity = '0';
-        formSide.style.transform = 'translateX(20px)';
-
-        setTimeout(() => {
-            formSide.style.transition = 'all 0.6s ease-out';
-            formSide.style.opacity = '1';
-            formSide.style.transform = 'translateX(0)';
-        }, 100);
-    }
-
-    if (heroSide) {
-        heroSide.style.opacity = '0';
-
-        setTimeout(() => {
-            heroSide.style.transition = 'opacity 0.8s ease-out';
-            heroSide.style.opacity = '1';
-        }, 50);
-    }
-});

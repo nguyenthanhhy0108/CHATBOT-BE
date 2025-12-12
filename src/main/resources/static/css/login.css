@@ -16,6 +16,163 @@ body {
 .page {
     display: flex;
     min-height: 100vh;
+    position: relative;
+}
+
+/* Skeleton Loading */
+.skeleton-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    background: #f9fafb;
+    transition: opacity 0.4s ease-out;
+}
+
+.skeleton-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.skeleton-hero-side {
+    flex: 0 0 65%;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: 32px 42px;
+    display: flex;
+    flex-direction: column;
+    gap: 42px;
+}
+
+.skeleton-form-side {
+    flex: 0 0 35%;
+    background: #f9fafb;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.skeleton-badge {
+    width: 140px;
+    height: 28px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(148,163,184,0.3) 25%, rgba(148,163,184,0.5) 50%, rgba(148,163,184,0.3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeleton-line {
+    height: 24px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(148,163,184,0.3) 25%, rgba(148,163,184,0.5) 50%, rgba(148,163,184,0.3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-title {
+    width: 70%;
+    height: 44px;
+}
+
+.skeleton-subtitle {
+    width: 85%;
+    height: 20px;
+}
+
+.skeleton-metrics {
+    display: flex;
+    gap: 16px;
+}
+
+.skeleton-metric {
+    width: 120px;
+    height: 60px;
+    border-radius: 14px;
+    background: linear-gradient(90deg, rgba(148,163,184,0.3) 25%, rgba(148,163,184,0.5) 50%, rgba(148,163,184,0.3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.skeleton-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-brand-text {
+    width: 100px;
+    height: 20px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-form {
+    max-width: 360px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 60px auto 0;
+}
+
+.skeleton-heading {
+    width: 60%;
+    height: 32px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-subheading {
+    width: 80%;
+    height: 18px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-input {
+    width: 100%;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-button {
+    width: 100%;
+    height: 48px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #93c5fd 25%, #bfdbfe 50%, #93c5fd 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 /* Left side: Hero section */
@@ -150,22 +307,22 @@ body {
 }
 
 .brand-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
-    background: conic-gradient(from 160deg, #3b82f6, #2563eb, #1d4ed8, #3b82f6);
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 12px 24px rgba(37,99,235,0.65);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 4px;
 }
 
-.brand-logo-inner {
-    width: 20px;
-    height: 20px;
-    border-radius: inherit;
-    background: radial-gradient(circle at 30% 0%, #bfdbfe, #3b82f6);
-    border: 2px solid rgba(15,23,42,0.2);
+.brand-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .brand-text-main {
@@ -424,10 +581,12 @@ form {
     .page {
         flex-direction: column;
     }
-    .hero-side {
+    .hero-side,
+    .skeleton-hero-side {
         display: none;
     }
-    .form-side {
+    .form-side,
+    .skeleton-form-side {
         flex: unset;
         min-height: 100vh;
     }

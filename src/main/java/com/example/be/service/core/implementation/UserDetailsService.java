@@ -1,7 +1,7 @@
-package com.example.be.service.implementation;
+package com.example.be.service.core.implementation;
 
 import com.example.be.model.entity.User;
-import com.example.be.repository.facade.UserRepository;
+import com.example.be.repository.interfaces.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

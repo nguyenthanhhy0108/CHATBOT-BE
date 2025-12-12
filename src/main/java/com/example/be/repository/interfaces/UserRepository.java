@@ -1,4 +1,4 @@
-package com.example.be.repository.facade;
+package com.example.be.repository.interfaces;
 
 import com.example.be.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
