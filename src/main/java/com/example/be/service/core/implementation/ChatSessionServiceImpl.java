@@ -1,7 +1,6 @@
 package com.example.be.service.core.implementation;
 
 import com.example.be.client.llm.factory.LLMServiceFactory;
-import com.example.be.configuration.YamlPropertySourceFactory;
 import com.example.be.mapper.ChatSessionMapper;
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
 import com.example.be.model.dto.service.response.ChatSessionCreationResponse;
@@ -11,8 +10,6 @@ import com.example.be.service.core.interfaces.ChatSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;

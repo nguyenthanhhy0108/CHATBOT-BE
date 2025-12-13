@@ -7,6 +7,7 @@ import com.example.be.model.dto.facade.request.ChatMessageRequest;
 import com.example.be.model.dto.facade.response.ChatMessageResponse;
 import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
+import com.example.be.model.dto.service.response.ChatMessageCreationResponse;
 import com.example.be.model.dto.service.response.ChatSessionCreationResponse;
 import com.example.be.service.core.interfaces.ChatMessageService;
 import com.example.be.service.core.interfaces.ChatSessionService;
@@ -29,52 +30,54 @@ import java.util.Objects;
 @PropertySource(value = "classpath:prompt.yml", factory = YamlPropertySourceFactory.class)
 public class ChatServiceImpl implements ChatService {
 
-    private static final String OPENAI_PROVIDER = "OPENAI";
+  private static final String OPENAI_PROVIDER = "OPENAI";
 
-    private final ChatSessionService chatSessionService;
-    private final ChatMessageService chatMessageService;
+  private final ChatSessionService chatSessionService;
+  private final ChatMessageService chatMessageService;
 
-    private final ChatMapper chatMapper;
+  private final ChatMapper chatMapper;
 
-    private final LLMServiceFactory llmServiceFactory;
+  private final LLMServiceFactory llmServiceFactory;
 
-    @Value("${chat-session.title-name-prompt}")
-    private String chatSessionTitlePrompt;
+  @Value("${chat-session.title-name-prompt}")
+  private String chatSessionTitlePrompt;
 
-    @Override
-    @Transactional
-    public ChatMessageResponse chat(ChatMessageRequest chatMessageRequest) {
-        boolean isFirstMessage = Objects.isNull(chatMessageRequest.getSessionId());
+  @Override
+  @Transactional
+  public ChatMessageResponse chat(ChatMessageRequest chatMessageRequest) {
+    boolean isFirstMessage = Objects.isNull(chatMessageRequest.getSessionId());
 
-        ChatSessionCreationRequest chatSessionCreationRequest = new ChatSessionCreationRequest();
-        if (isFirstMessage) {
-            chatSessionCreationRequest.setTitle(
-                    this.getChatSessionTitle(chatMessageRequest.getMessage())
-            );
-        }
-        chatSessionCreationRequest.setUserId(chatMessageRequest.getUserId());
-        ChatSessionCreationResponse chatSessionCreationResponse =
-                this.chatSessionService.createChatSession(chatSessionCreationRequest);
-
-        ChatMessageCreationRequest chatMessageCreationRequest =
-                ChatMessageCreationRequest.builder()
-                        .sessionId(chatSessionCreationResponse.getId())
-                        .message(chatMessageRequest.getMessage())
-                        .senderType(chatMessageRequest.getSenderType())
-                        .build();
-        return this.chatMapper
-                .toChatMessageResponse(
-                        this.chatMessageService.createChatMessage(chatMessageCreationRequest)
-                );
+    ChatSessionCreationRequest chatSessionCreationRequest = new ChatSessionCreationRequest();
+    if (isFirstMessage) {
+      chatSessionCreationRequest.setTitle(
+          this.getChatSessionTitle(chatMessageRequest.getMessage())
+      );
     }
+    chatSessionCreationRequest.setUserId(chatMessageRequest.getUserId());
+    ChatSessionCreationResponse chatSessionCreationResponse =
+        this.chatSessionService.createChatSession(chatSessionCreationRequest);
 
-    private String getChatSessionTitle(String firstMessage) {
-        try {
-            return this.llmServiceFactory.getService(ChatServiceImpl.OPENAI_PROVIDER)
-                    .chat(chatSessionTitlePrompt.replace("{FIRST_MESSAGE}", firstMessage));
-        } catch (Exception e) {
-            log.error(Arrays.toString(e.getStackTrace()));
-            throw e;
-        }
+    ChatMessageCreationRequest chatMessageCreationRequest =
+        ChatMessageCreationRequest.builder()
+            .sessionId(chatSessionCreationResponse.getId())
+            .message(chatMessageRequest.getMessage())
+            .senderType(chatMessageRequest.getSenderType())
+            .build();
+
+    ChatMessageCreationResponse chatMessageCreationResponse = this.chatMessageService.createChatMessage(
+        chatMessageCreationRequest);
+
+    return this.chatMapper
+        .toChatMessageResponse(chatMessageCreationResponse, chatSessionCreationResponse);
+  }
+
+  private String getChatSessionTitle(String firstMessage) {
+    try {
+      return this.llmServiceFactory.getService(ChatServiceImpl.OPENAI_PROVIDER)
+          .chat(chatSessionTitlePrompt.replace("{FIRST_MESSAGE}", firstMessage));
+    } catch (Exception e) {
+      log.error(Arrays.toString(e.getStackTrace()));
+      throw e;
     }
+  }
 }

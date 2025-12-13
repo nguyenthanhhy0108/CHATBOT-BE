@@ -5,7 +5,7 @@ import com.example.be.model.dto.service.response.ChatSessionCreationResponse;
 import com.example.be.model.entity.ChatSession;
 
 @Mapper(componentModel = "spring")
-public interface ChatSessionMapper {
+public abstract class ChatSessionMapper {
 
-    ChatSessionCreationResponse toCreationResponse(ChatSession chatSession);
+    public abstract ChatSessionCreationResponse toCreationResponse(ChatSession chatSession);
 }

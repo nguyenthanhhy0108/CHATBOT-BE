@@ -21,7 +21,8 @@ public class LLMServiceFactory {
     public LLMService getService(String provider) {
         return Optional.ofNullable(provider)
                 .map(String::toUpperCase)
-                .flatMap(p -> serviceMap().entrySet().stream()
+                .flatMap(p -> serviceMap().entrySet()
+                        .stream()
                         .filter(e -> e.getKey().equals(p))
                         .map(Map.Entry::getValue)
                         .findFirst())
