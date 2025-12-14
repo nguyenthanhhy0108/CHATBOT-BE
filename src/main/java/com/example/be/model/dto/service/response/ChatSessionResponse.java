@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ChatSessionCreationResponse extends BaseResponseDto {
+public class ChatSessionResponse extends BaseResponseDto {
 
     private UUID userId;
 

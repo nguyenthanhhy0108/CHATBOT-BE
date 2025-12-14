@@ -3,10 +3,11 @@ package com.example.be.service.core.implementation;
 import com.example.be.client.llm.factory.LLMServiceFactory;
 import com.example.be.mapper.ChatSessionMapper;
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
-import com.example.be.model.dto.service.response.ChatSessionCreationResponse;
+import com.example.be.model.dto.service.response.ChatSessionResponse;
 import com.example.be.model.entity.ChatSession;
 import com.example.be.repository.interfaces.ChatSessionRepository;
 import com.example.be.service.core.interfaces.ChatSessionService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class ChatSessionServiceImpl implements ChatSessionService {
     private final ChatSessionMapper chatSessionMapper;
 
     @Override
-    public ChatSessionCreationResponse createChatSession(ChatSessionCreationRequest request) {
+    public ChatSessionResponse createChatSession(ChatSessionCreationRequest request) {
         if (request.getUserId() == null) {
             throw new IllegalArgumentException("userId is required to create a chat session");
         }
@@ -37,7 +38,20 @@ public class ChatSessionServiceImpl implements ChatSessionService {
 
         try {
             ChatSession savedSession = chatSessionRepository.save(session);
-            return chatSessionMapper.toCreationResponse(savedSession);
+            return chatSessionMapper.toResponse(savedSession);
+        } catch (Exception e) {
+            log.error(Arrays.toString(e.getStackTrace()));
+            throw e;
+        }
+    }
+
+    @Override
+    public ChatSessionResponse findChatSessionById(String id) {
+        try {
+            ChatSession savedSession = chatSessionRepository.findById(UUID.fromString(id)).orElseThrow(
+                () -> new IllegalArgumentException("Invalid chat session id: " + id)
+            );
+            return chatSessionMapper.toResponse(savedSession);
         } catch (Exception e) {
             log.error(Arrays.toString(e.getStackTrace()));
             throw e;

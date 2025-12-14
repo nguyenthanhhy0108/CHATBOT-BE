@@ -1,7 +1,7 @@
 package com.example.be.controller;
 
-import com.example.be.model.dto.facade.request.ChatMessageRequest;
-import com.example.be.model.dto.facade.response.ChatMessageResponse;
+import com.example.be.model.dto.facade.request.ChatRequest;
+import com.example.be.model.dto.facade.response.ChatResponse;
 import com.example.be.model.standard.ApiResponse;
 import com.example.be.service.facade.interfaces.ChatService;
 import jakarta.validation.Valid;
@@ -23,12 +23,12 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/chat")
-    public ResponseEntity<ApiResponse<ChatMessageResponse>> chat(
-            @Valid @RequestBody ChatMessageRequest chatMessageRequest
+    public ResponseEntity<ApiResponse<ChatResponse>> chat(
+            @Valid @RequestBody ChatRequest chatRequest
     ) {
         return ResponseEntity.ok(
-                ApiResponse.<ChatMessageResponse>builder()
-                        .data(this.chatService.chat(chatMessageRequest))
+                ApiResponse.<ChatResponse>builder()
+                        .data(this.chatService.chat(chatRequest))
                         .build()
         );
     }

@@ -3,15 +3,17 @@ package com.example.be.service.facade.implementation;
 import com.example.be.client.llm.factory.LLMServiceFactory;
 import com.example.be.configuration.YamlPropertySourceFactory;
 import com.example.be.mapper.ChatMapper;
-import com.example.be.model.dto.facade.request.ChatMessageRequest;
-import com.example.be.model.dto.facade.response.ChatMessageResponse;
+import com.example.be.model.dto.facade.request.ChatRequest;
+import com.example.be.model.dto.facade.response.ChatResponse;
 import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
-import com.example.be.model.dto.service.response.ChatMessageCreationResponse;
-import com.example.be.model.dto.service.response.ChatSessionCreationResponse;
+import com.example.be.model.dto.service.response.ChatMessageResponse;
+import com.example.be.model.dto.service.response.ChatSessionResponse;
+import com.example.be.model.entity.SenderType;
 import com.example.be.service.core.interfaces.ChatMessageService;
 import com.example.be.service.core.interfaces.ChatSessionService;
 import com.example.be.service.facade.interfaces.ChatService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,31 +46,43 @@ public class ChatServiceImpl implements ChatService {
 
   @Override
   @Transactional
-  public ChatMessageResponse chat(ChatMessageRequest chatMessageRequest) {
-    boolean isFirstMessage = Objects.isNull(chatMessageRequest.getSessionId());
+  public ChatResponse chat(ChatRequest chatRequest) {
+    boolean isFirstMessage = Objects.isNull(chatRequest.getSessionId());
+    ChatSessionResponse chatSessionResponse;
 
     ChatSessionCreationRequest chatSessionCreationRequest = new ChatSessionCreationRequest();
     if (isFirstMessage) {
       chatSessionCreationRequest.setTitle(
-          this.getChatSessionTitle(chatMessageRequest.getMessage())
+          this.getChatSessionTitle(chatRequest.getMessage())
       );
+      chatSessionCreationRequest.setUserId(UUID.fromString(chatRequest.getUserId()));
+      chatSessionResponse =
+          this.chatSessionService.createChatSession(chatSessionCreationRequest);
+    } else {
+      chatSessionResponse = this.chatSessionService.findChatSessionById(chatRequest.getSessionId());
     }
-    chatSessionCreationRequest.setUserId(chatMessageRequest.getUserId());
-    ChatSessionCreationResponse chatSessionCreationResponse =
-        this.chatSessionService.createChatSession(chatSessionCreationRequest);
 
     ChatMessageCreationRequest chatMessageCreationRequest =
         ChatMessageCreationRequest.builder()
-            .sessionId(chatSessionCreationResponse.getId())
-            .message(chatMessageRequest.getMessage())
-            .senderType(chatMessageRequest.getSenderType())
+            .sessionId(chatSessionResponse.getId())
+            .message(chatRequest.getMessage())
+            .senderType(chatRequest.getSenderType())
             .build();
 
-    ChatMessageCreationResponse chatMessageCreationResponse = this.chatMessageService.createChatMessage(
+    ChatMessageResponse chatMessageResponse = this.chatMessageService.createChatMessage(
         chatMessageCreationRequest);
 
-    return this.chatMapper
-        .toChatMessageResponse(chatMessageCreationResponse, chatSessionCreationResponse);
+    //TODO: AI ChatMessageResponse
+
+    ChatResponse chatResponse = this.chatMapper
+        .toChatResponse(chatMessageResponse, chatSessionResponse);
+
+    chatResponse.setSenderType(SenderType.AI);
+    chatResponse.setUrls(Arrays.asList(
+        "https://example.com", "https://example.com", "https://example.com"
+    ));
+
+    return chatResponse;
   }
 
   private String getChatSessionTitle(String firstMessage) {

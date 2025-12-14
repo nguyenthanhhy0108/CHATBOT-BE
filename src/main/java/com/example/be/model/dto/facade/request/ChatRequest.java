@@ -6,11 +6,11 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class ChatMessageRequest {
+public class ChatRequest {
 
-    private UUID userId;
+    private String userId;
 
-    private UUID sessionId;
+    private String sessionId;
 
     private String message;
 

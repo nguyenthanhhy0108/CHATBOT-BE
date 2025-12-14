@@ -1,10 +1,10 @@
 package com.example.be.service.core.interfaces;
 
 import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
-import com.example.be.model.dto.service.response.ChatMessageCreationResponse;
+import com.example.be.model.dto.service.response.ChatMessageResponse;
 
 public interface ChatMessageService {
 
-    ChatMessageCreationResponse createChatMessage(ChatMessageCreationRequest request);
+    ChatMessageResponse createChatMessage(ChatMessageCreationRequest request);
 }
 

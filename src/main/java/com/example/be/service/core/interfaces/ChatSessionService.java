@@ -1,9 +1,12 @@
 package com.example.be.service.core.interfaces;
 
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
-import com.example.be.model.dto.service.response.ChatSessionCreationResponse;
+import com.example.be.model.dto.service.response.ChatSessionResponse;
 
 public interface ChatSessionService {
 
-    ChatSessionCreationResponse createChatSession(ChatSessionCreationRequest request);
+    ChatSessionResponse createChatSession(ChatSessionCreationRequest request);
+
+    ChatSessionResponse findChatSessionById(String id);
+
 }

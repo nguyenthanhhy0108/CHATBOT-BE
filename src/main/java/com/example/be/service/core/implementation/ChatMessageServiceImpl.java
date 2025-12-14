@@ -2,7 +2,7 @@ package com.example.be.service.core.implementation;
 
 import com.example.be.mapper.ChatMessageMapper;
 import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
-import com.example.be.model.dto.service.response.ChatMessageCreationResponse;
+import com.example.be.model.dto.service.response.ChatMessageResponse;
 import com.example.be.model.entity.ChatMessage;
 import com.example.be.model.entity.ChatSession;
 import com.example.be.repository.interfaces.ChatMessageRepository;
@@ -26,7 +26,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatMessageMapper chatMessageMapper;
 
     @Override
-    public ChatMessageCreationResponse createChatMessage(ChatMessageCreationRequest request) {
+    public ChatMessageResponse createChatMessage(ChatMessageCreationRequest request) {
         validateRequest(request);
 
         ChatSession session = chatSessionRepository.findById(request.getSessionId())
@@ -39,7 +39,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
         try {
             ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
-            return chatMessageMapper.toCreationResponse(savedMessage);
+            return chatMessageMapper.toResponse(savedMessage);
         } catch (Exception e) {
             log.error(Arrays.toString(e.getStackTrace()));
             throw e;

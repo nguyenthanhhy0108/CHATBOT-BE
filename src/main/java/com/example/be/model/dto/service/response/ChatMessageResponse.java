@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ChatMessageCreationResponse extends BaseResponseDto {
+public class ChatMessageResponse extends BaseResponseDto {
 
     private UUID sessionId;
 

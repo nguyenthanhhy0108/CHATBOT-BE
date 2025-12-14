@@ -1,9 +1,9 @@
 package com.example.be.service.facade.interfaces;
 
-import com.example.be.model.dto.facade.request.ChatMessageRequest;
-import com.example.be.model.dto.facade.response.ChatMessageResponse;
+import com.example.be.model.dto.facade.request.ChatRequest;
+import com.example.be.model.dto.facade.response.ChatResponse;
 
 public interface ChatService {
 
-    ChatMessageResponse chat(ChatMessageRequest chatMessageRequest);
+    ChatResponse chat(ChatRequest chatRequest);
 }
