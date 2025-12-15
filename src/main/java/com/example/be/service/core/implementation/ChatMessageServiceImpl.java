@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -26,10 +27,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatMessageMapper chatMessageMapper;
 
     @Override
+    @Transactional
     public ChatMessageResponse createChatMessage(ChatMessageCreationRequest request) {
-        validateRequest(request);
-
-        ChatSession session = chatSessionRepository.findById(request.getSessionId())
+        ChatSession session = chatSessionRepository.findById(UUID.fromString(request.getSessionId()))
                 .orElseThrow(() -> new IllegalArgumentException("Chat session not found: " + request.getSessionId()));
 
         ChatMessage chatMessage = new ChatMessage();
@@ -43,22 +43,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         } catch (Exception e) {
             log.error(Arrays.toString(e.getStackTrace()));
             throw e;
-        }
-    }
-
-    private void validateRequest(ChatMessageCreationRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request cannot be null");
-        }
-        UUID sessionId = request.getSessionId();
-        if (sessionId == null) {
-            throw new IllegalArgumentException("sessionId is required to create a chat message");
-        }
-        if (request.getSenderType() == null) {
-            throw new IllegalArgumentException("senderType is required to create a chat message");
-        }
-        if (request.getMessage() == null || request.getMessage().isBlank()) {
-            throw new IllegalArgumentException("message is required to create a chat message");
         }
     }
 }

@@ -1,43 +1,39 @@
 package com.example.be.client.llm.factory;
 
 import com.example.be.client.llm.LLMService;
-import com.example.be.client.llm.implementation.OpenAiLLMServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class LLMServiceFactory {
 
-    public static final String OPENAI = "OPENAI";
-
-    private final OpenAiLLMServiceImpl openAiLLMService;
+    private final Map<String, LLMService> serviceMap;
 
     public LLMService getService(String provider) {
-        return Optional.ofNullable(provider)
-                .map(String::toUpperCase)
-                .flatMap(p -> serviceMap().entrySet()
-                        .stream()
-                        .filter(e -> e.getKey().equals(p))
-                        .map(Map.Entry::getValue)
-                        .findFirst())
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported LLM provider: " + provider));
+        if (provider == null) {
+            return defaultService();
+        }
+
+        LLMService service = serviceMap.get(provider.toUpperCase());
+
+        if (service == null) {
+            throw new IllegalArgumentException(
+                "Unsupported LLM provider: " + provider
+            );
+        }
+
+        return service;
     }
 
     public LLMService defaultService() {
-        return openAiLLMService;
-    }
-
-    private Map<String, LLMService> serviceMap() {
-        return Map.of(OPENAI, openAiLLMService);
+        return serviceMap.get(LLMProviders.OPENAI);
     }
 
     public Set<String> getSupportedProviders() {
-        return this.serviceMap().keySet();
+        return serviceMap.keySet();
     }
 }

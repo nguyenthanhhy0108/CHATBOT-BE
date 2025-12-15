@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ChatMessageCreationRequest {
 
-    private UUID sessionId;
+    private String sessionId;
 
     private String message;
 

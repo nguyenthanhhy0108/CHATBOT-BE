@@ -10,13 +10,25 @@ public class BeApplication {
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.load();
 
-		System.setProperty("OPENAI_API_KEY", getEnv("OPENAI_API_KEY", dotenv));
+		setOpenAiKeyToEnvironment(dotenv);
+		setDatabaseCredentialsToEnvironment(dotenv);
+		setReactClientPropertiesToEnvironment(dotenv);
 
+		SpringApplication.run(BeApplication.class, args);
+	}
+
+	private static void setOpenAiKeyToEnvironment(Dotenv dotenv) {
+		System.setProperty("OPENAI_API_KEY", getEnv("OPENAI_API_KEY", dotenv));
+	}
+
+	private static void setDatabaseCredentialsToEnvironment(Dotenv dotenv) {
 		System.setProperty("POSTGRES_URL", getEnv("POSTGRES_URL", dotenv));
 		System.setProperty("POSTGRES_USER", getEnv("POSTGRES_USER", dotenv));
 		System.setProperty("POSTGRES_PASSWORD", getEnv("POSTGRES_PASSWORD", dotenv));
+	}
 
-		SpringApplication.run(BeApplication.class, args);
+	private static void setReactClientPropertiesToEnvironment(Dotenv dotenv) {
+		System.setProperty("CLIENT_URL", getEnv("CLIENT_URL", dotenv));
 	}
 
 	private static String getEnv(String key, Dotenv dotenv) {

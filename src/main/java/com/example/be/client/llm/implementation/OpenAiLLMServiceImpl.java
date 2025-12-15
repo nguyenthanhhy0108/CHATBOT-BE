@@ -3,6 +3,7 @@ package com.example.be.client.llm.implementation;
 import com.example.be.client.dto.request.OpenAiRequestDto;
 import com.example.be.client.dto.response.OpenAiResponseDto;
 import com.example.be.client.llm.LLMService;
+import com.example.be.client.llm.factory.LLMProviders;
 import com.example.be.configuration.YamlPropertySourceFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Slf4j
-@Component
+@Component(LLMProviders.OPENAI)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @PropertySource(value = "classpath:openai.yml", factory = YamlPropertySourceFactory.class)
 public class OpenAiLLMServiceImpl implements LLMService {

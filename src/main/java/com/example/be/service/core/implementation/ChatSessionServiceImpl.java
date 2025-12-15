@@ -1,6 +1,5 @@
 package com.example.be.service.core.implementation;
 
-import com.example.be.client.llm.factory.LLMServiceFactory;
 import com.example.be.mapper.ChatSessionMapper;
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
 import com.example.be.model.dto.service.response.ChatSessionResponse;
@@ -14,18 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ChatSessionServiceImpl implements ChatSessionService {
 
-    private final LLMServiceFactory llmServiceFactory;
-
     private final ChatSessionRepository chatSessionRepository;
     private final ChatSessionMapper chatSessionMapper;
 
     @Override
+    @Transactional
     public ChatSessionResponse createChatSession(ChatSessionCreationRequest request) {
         if (request.getUserId() == null) {
             throw new IllegalArgumentException("userId is required to create a chat session");
