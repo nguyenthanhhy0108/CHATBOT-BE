@@ -8,7 +8,7 @@ import com.example.be.client.rag.factory.RagProviders;
 import com.example.be.client.rag.factory.RagServiceFactory;
 import com.example.be.configuration.YamlPropertySourceFactory;
 import com.example.be.exception.RagQueryException;
-import com.example.be.mapper.ChatMapper;
+import com.example.be.mapper.facade.ChatMapper;
 import com.example.be.model.dto.facade.request.ChatRequest;
 import com.example.be.model.dto.facade.response.ChatResponse;
 import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
@@ -16,8 +16,8 @@ import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
 import com.example.be.model.dto.service.response.ChatMessageResponse;
 import com.example.be.model.dto.service.response.ChatSessionResponse;
 import com.example.be.model.entity.SenderType;
-import com.example.be.service.core.interfaces.ChatMessageService;
-import com.example.be.service.core.interfaces.ChatSessionService;
+import com.example.be.service.core.interfaces.ChatMessageServiceCore;
+import com.example.be.service.core.interfaces.ChatSessionServiceCore;
 import com.example.be.service.facade.interfaces.ChatService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +39,8 @@ import org.springframework.util.StopWatch;
 @PropertySource(value = "classpath:prompt.yml", factory = YamlPropertySourceFactory.class)
 public class ChatServiceImpl implements ChatService {
 
-  private final ChatSessionService chatSessionService;
-  private final ChatMessageService chatMessageService;
+  private final ChatSessionServiceCore chatSessionServiceCore;
+  private final ChatMessageServiceCore chatMessageServiceCore;
 
   private final ChatMapper chatMapper;
 
@@ -62,14 +62,14 @@ public class ChatServiceImpl implements ChatService {
       chatSessionCreationRequest.setTitle(getChatSessionTitle(chatRequest.getMessage()));
       chatSessionCreationRequest.setUserId(UUID.fromString(chatRequest.getUserId()));
 
-      chatSessionResponse = chatSessionService.createChatSession(chatSessionCreationRequest);
+      chatSessionResponse = chatSessionServiceCore.createChatSession(chatSessionCreationRequest);
     } else {
-      chatSessionResponse = chatSessionService.findChatSessionById(chatRequest.getSessionId());
+      chatSessionResponse = chatSessionServiceCore.findChatSessionById(chatRequest.getSessionId());
     }
 
     String sessionId = chatSessionResponse.getId().toString();
 
-    ChatMessageResponse userMessage = chatMessageService.createChatMessage(
+    ChatMessageResponse userMessage = chatMessageServiceCore.createChatMessage(
         ChatMessageCreationRequest.builder()
             .sessionId(sessionId)
             .message(chatRequest.getMessage())
@@ -80,7 +80,7 @@ public class ChatServiceImpl implements ChatService {
 
     RagResponseDto botAnswer = this.queryRag(chatRequest.getMessage());
 
-    ChatMessageResponse botMessage = chatMessageService.createChatMessage(
+    ChatMessageResponse botMessage = chatMessageServiceCore.createChatMessage(
         ChatMessageCreationRequest.builder().sessionId(sessionId).message(botAnswer.getMessage())
             .senderType(SenderType.AI).build());
 

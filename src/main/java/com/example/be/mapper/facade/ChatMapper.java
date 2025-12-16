@@ -1,4 +1,4 @@
-package com.example.be.mapper;
+package com.example.be.mapper.facade;
 
 import com.example.be.model.dto.facade.response.ChatResponse;
 import com.example.be.model.dto.service.response.ChatMessageResponse;
