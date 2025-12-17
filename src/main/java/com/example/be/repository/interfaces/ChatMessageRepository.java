@@ -10,5 +10,6 @@ import java.util.UUID;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> {
 
+    java.util.List<ChatMessage> findBySession_IdOrderByCreatedAtAsc(UUID sessionId);
 }
 

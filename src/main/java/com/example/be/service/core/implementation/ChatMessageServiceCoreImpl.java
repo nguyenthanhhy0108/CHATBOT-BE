@@ -45,5 +45,18 @@ public class ChatMessageServiceCoreImpl implements ChatMessageServiceCore {
             throw e;
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<ChatMessageResponse> getMessagesBySessionId(String sessionId) {
+        java.util.UUID sessionUuid = java.util.UUID.fromString(sessionId);
+
+        java.util.List<ChatMessage> messages =
+            chatMessageRepository.findBySession_IdOrderByCreatedAtAsc(sessionUuid);
+
+        return messages.stream()
+            .map(chatMessageMapperCore::toResponse)
+            .toList();
+    }
 }
 

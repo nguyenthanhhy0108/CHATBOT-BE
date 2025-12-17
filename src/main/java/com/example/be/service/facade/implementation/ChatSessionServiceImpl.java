@@ -2,7 +2,9 @@ package com.example.be.service.facade.implementation;
 
 import com.example.be.helper.SecurityHelper;
 import com.example.be.mapper.facade.ChatSessionMapper;
+import com.example.be.model.dto.facade.request.ChatSessionCreateRequest;
 import com.example.be.model.dto.facade.response.ChatSessionResponse;
+import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
 import com.example.be.service.core.interfaces.ChatSessionServiceCore;
 import com.example.be.service.facade.interfaces.ChatSessionService;
 import java.util.List;
@@ -30,10 +32,28 @@ public class ChatSessionServiceImpl implements ChatSessionService {
 
     String userId = securityHelper.getUserId().toString();
 
+    log.debug(userId);
+
     return chatSessionServiceCore
         .getAllChatSessionsOfUser(userId)
         .stream()
         .map(chatSessionMapper::toChatSessionResponse)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  @PreAuthorize("@security.hasUserId()")
+  public ChatSessionResponse createChatSession(ChatSessionCreateRequest request) {
+
+    String userId = securityHelper.getUserId().toString();
+
+    ChatSessionCreationRequest coreRequest = ChatSessionCreationRequest.builder()
+        .userId(securityHelper.getUserId())
+        .title(request.getTitle())
+        .build();
+
+    return chatSessionMapper.toChatSessionResponse(
+        chatSessionServiceCore.createChatSession(coreRequest)
+    );
   }
 }

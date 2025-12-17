@@ -1,5 +1,6 @@
 package com.example.be.mapper.facade;
 
+import com.example.be.model.dto.facade.response.ChatMessageHistoryItem;
 import com.example.be.model.dto.facade.response.ChatResponse;
 import com.example.be.model.dto.service.response.ChatMessageResponse;
 import com.example.be.model.dto.service.response.ChatSessionResponse;
@@ -23,6 +24,21 @@ public abstract class ChatMapper {
         .updatedBy(chatMessageResponse.getUpdatedBy())
         .version(chatMessageResponse.getVersion())
         .isDeleted(chatMessageResponse.isDeleted())
+        .build();
+  }
+
+  public ChatMessageHistoryItem toChatMessageHistoryItem(ChatMessageResponse chatMessageResponse) {
+    return ChatMessageHistoryItem.builder()
+        .sessionId(chatMessageResponse.getSessionId())
+        .message(chatMessageResponse.getMessage())
+        .senderType(chatMessageResponse.getSenderType())
+        .createdAt(chatMessageResponse.getCreatedAt())
+        .createdBy(chatMessageResponse.getCreatedBy())
+        .updatedAt(chatMessageResponse.getUpdatedAt())
+        .updatedBy(chatMessageResponse.getUpdatedBy())
+        .version(chatMessageResponse.getVersion())
+        .isDeleted(chatMessageResponse.isDeleted())
+        .id(chatMessageResponse.getId())
         .build();
   }
 

@@ -8,8 +8,10 @@ import com.example.be.client.rag.factory.RagProviders;
 import com.example.be.client.rag.factory.RagServiceFactory;
 import com.example.be.configuration.YamlPropertySourceFactory;
 import com.example.be.exception.RagQueryException;
+import com.example.be.helper.SecurityHelper;
 import com.example.be.mapper.facade.ChatMapper;
 import com.example.be.model.dto.facade.request.ChatRequest;
+import com.example.be.model.dto.facade.response.ChatMessageHistoryItem;
 import com.example.be.model.dto.facade.response.ChatResponse;
 import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
@@ -46,6 +48,7 @@ public class ChatServiceImpl implements ChatService {
 
   private final LLMServiceFactory llmServiceFactory;
   private final RagServiceFactory ragServiceFactory;
+  private final SecurityHelper securityHelper;
 
   @Value("${chat-session.title-name-prompt}")
   private String chatSessionTitlePrompt;
@@ -54,13 +57,18 @@ public class ChatServiceImpl implements ChatService {
   @Transactional(rollbackFor = RagQueryException.class)
   public ChatResponse chat(ChatRequest chatRequest) {
 
+    UUID userId = securityHelper.getUserId();
+    if (userId == null) {
+      throw new RagQueryException("User is not authenticated");
+    }
+
     boolean isFirstMessage = Objects.isNull(chatRequest.getSessionId());
     ChatSessionResponse chatSessionResponse;
 
     if (isFirstMessage) {
       ChatSessionCreationRequest chatSessionCreationRequest = new ChatSessionCreationRequest();
       chatSessionCreationRequest.setTitle(getChatSessionTitle(chatRequest.getMessage()));
-      chatSessionCreationRequest.setUserId(UUID.fromString(chatRequest.getUserId()));
+      chatSessionCreationRequest.setUserId(userId);
 
       chatSessionResponse = chatSessionServiceCore.createChatSession(chatSessionCreationRequest);
     } else {
@@ -73,7 +81,7 @@ public class ChatServiceImpl implements ChatService {
         ChatMessageCreationRequest.builder()
             .sessionId(sessionId)
             .message(chatRequest.getMessage())
-            .senderType(chatRequest.getSenderType())
+            .senderType(SenderType.USER)
             .build());
 
     log.info("Created user chat message {}", userMessage.getId());
@@ -85,6 +93,16 @@ public class ChatServiceImpl implements ChatService {
             .senderType(SenderType.AI).build());
 
     return this.buildChatResponse(botMessage, chatSessionResponse, botAnswer);
+  }
+
+  @Transactional(readOnly = true)
+  public java.util.List<ChatMessageHistoryItem> getChatHistory(String sessionId) {
+    java.util.List<ChatMessageResponse> coreMessages =
+        chatMessageServiceCore.getMessagesBySessionId(sessionId);
+
+    return coreMessages.stream()
+        .map(chatMapper::toChatMessageHistoryItem)
+        .toList();
   }
 
   private ChatResponse buildChatResponse(ChatMessageResponse botChatMessageResponse,

@@ -8,12 +8,8 @@ import java.util.UUID;
 @Data
 public class ChatRequest {
 
-    private String userId;
-
     private String sessionId;
 
     private String message;
-
-    private SenderType senderType;
 }
 
