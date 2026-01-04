@@ -1,5 +1,7 @@
 package com.example.be.model.standard;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,7 +22,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseAuditableEntity {
+public abstract class BaseAuditableEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -44,7 +49,7 @@ public abstract class BaseAuditableEntity {
 
     @Version
     @Column(nullable = false)
-    private Long version;
+    private Long version  = 0L;
 
     @Column(name = "IS_DELETED", nullable = false)
     private boolean isDeleted = false;

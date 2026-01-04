@@ -5,9 +5,12 @@ import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
 import com.example.be.model.dto.service.response.ChatMessageResponse;
 import com.example.be.model.entity.ChatMessage;
 import com.example.be.model.entity.ChatSession;
+import com.example.be.model.entity.ChatUrl;
 import com.example.be.repository.interfaces.ChatMessageRepository;
 import com.example.be.repository.interfaces.ChatSessionRepository;
 import com.example.be.service.core.interfaces.ChatMessageServiceCore;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +29,22 @@ public class ChatMessageServiceCoreImpl implements ChatMessageServiceCore {
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageMapperCore chatMessageMapperCore;
 
-    @Override
-    @Transactional
-    public ChatMessageResponse createChatMessage(ChatMessageCreationRequest request) {
+    private ChatMessage buildBasicInfo(ChatMessageCreationRequest request) {
         ChatSession session = chatSessionRepository.findById(UUID.fromString(request.getSessionId()))
-                .orElseThrow(() -> new IllegalArgumentException("Chat session not found: " + request.getSessionId()));
+            .orElseThrow(() -> new IllegalArgumentException("Chat session not found: " + request.getSessionId()));
 
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setSession(session);
         chatMessage.setMessage(request.getMessage());
         chatMessage.setSenderType(request.getSenderType());
+
+        return chatMessage;
+    }
+
+    @Override
+    @Transactional
+    public ChatMessageResponse createChatMessage(ChatMessageCreationRequest request) {
+        ChatMessage chatMessage = buildBasicInfo(request);
 
         try {
             ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
@@ -57,6 +66,26 @@ public class ChatMessageServiceCoreImpl implements ChatMessageServiceCore {
         return messages.stream()
             .map(chatMessageMapperCore::toResponse)
             .toList();
+    }
+
+    @Override
+    @Transactional
+    public ChatMessageResponse createChatMessageWithChatUrls(
+        ChatMessageCreationRequest request,
+        List<ChatUrl> chatUrls
+    ) {
+        ChatMessage chatMessage = buildBasicInfo(request);
+
+        if (chatUrls != null && !chatUrls.isEmpty()) {
+            chatMessage.setUrls(new ArrayList<>(chatUrls));
+            for (ChatUrl chatUrl : chatUrls) {
+                chatUrl.setMessage(chatMessage);
+            }
+        }
+
+        ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
+
+        return chatMessageMapperCore.toResponse(savedMessage);
     }
 }
 

@@ -1,6 +1,7 @@
 chat-session:
   title-name-prompt: |
-    Generate a short, clear, and context-accurate title for this chat based on the first user message.
-    The title should be concise (3–6 words), in English, and describe the main intent or topic.
-    Do not include punctuation or quotes.
-    First message: {FIRST_MESSAGE}
+    Hãy tạo một tiêu đề ngắn gọn, rõ ràng và đúng ngữ cảnh cho cuộc trò chuyện này
+    dựa trên tin nhắn đầu tiên của người dùng.
+    Tiêu đề cần súc tích (3–6 từ), bằng tiếng Việt, và mô tả đúng ý định hoặc chủ đề chính.
+    Không sử dụng dấu câu hoặc dấu ngoặc kép.
+    Tin nhắn đầu tiên: {FIRST_MESSAGE}

@@ -17,10 +17,14 @@ import com.example.be.model.dto.service.request.ChatMessageCreationRequest;
 import com.example.be.model.dto.service.request.ChatSessionCreationRequest;
 import com.example.be.model.dto.service.response.ChatMessageResponse;
 import com.example.be.model.dto.service.response.ChatSessionResponse;
+import com.example.be.model.entity.ChatUrl;
 import com.example.be.model.entity.SenderType;
 import com.example.be.service.core.interfaces.ChatMessageServiceCore;
 import com.example.be.service.core.interfaces.ChatSessionServiceCore;
+import com.example.be.service.core.interfaces.ChatUrlServiceCore;
 import com.example.be.service.facade.interfaces.ChatService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +47,7 @@ public class ChatServiceImpl implements ChatService {
 
   private final ChatSessionServiceCore chatSessionServiceCore;
   private final ChatMessageServiceCore chatMessageServiceCore;
+  private final ChatUrlServiceCore chatUrlServiceCore;
 
   private final ChatMapper chatMapper;
 
@@ -88,11 +93,18 @@ public class ChatServiceImpl implements ChatService {
 
     RagResponseDto botAnswer = this.queryRag(chatRequest.getMessage());
 
-    ChatMessageResponse botMessage = chatMessageServiceCore.createChatMessage(
-        ChatMessageCreationRequest.builder().sessionId(sessionId).message(botAnswer.getMessage())
-            .senderType(SenderType.AI).build());
+    List<ChatUrl> chatUrls = new ArrayList<>();
+    for(String url : botAnswer.getUrls()) {
+      chatUrls.add(
+        ChatUrl.builder().url(url).build()
+      );
+    }
 
-    return this.buildChatResponse(botMessage, chatSessionResponse, botAnswer);
+    ChatMessageResponse botMessage = chatMessageServiceCore.createChatMessageWithChatUrls(
+        ChatMessageCreationRequest.builder().sessionId(sessionId).message(botAnswer.getMessage())
+            .senderType(SenderType.AI).build(), chatUrls);
+
+    return this.buildChatResponse(botMessage, chatSessionResponse);
   }
 
   @Transactional(readOnly = true)
@@ -106,12 +118,9 @@ public class ChatServiceImpl implements ChatService {
   }
 
   private ChatResponse buildChatResponse(ChatMessageResponse botChatMessageResponse,
-      ChatSessionResponse chatSessionResponse, RagResponseDto ragResponseDto) {
-    ChatResponse chatResponse = this.chatMapper.toChatResponse(botChatMessageResponse,
+      ChatSessionResponse chatSessionResponse) {
+    return this.chatMapper.toChatResponse(botChatMessageResponse,
         chatSessionResponse);
-    chatResponse.setUrls(ragResponseDto.getUrls());
-
-    return chatResponse;
   }
 
   private RagResponseDto queryRag(String question) {

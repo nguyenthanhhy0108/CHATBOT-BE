@@ -31,7 +31,6 @@ public class UserController {
 
     String userId = principal.getUserId().toString();
 
-    // 设置 HttpOnly Cookie，前端 JS 无法读取，但浏览器会自动携带
     ResponseCookie userIdCookie = ResponseCookie.from("user-id", urlEncode(userId))
         .httpOnly(true)
         .path("/")

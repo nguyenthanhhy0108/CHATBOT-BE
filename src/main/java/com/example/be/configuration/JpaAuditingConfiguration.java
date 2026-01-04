@@ -20,6 +20,7 @@ import java.util.UUID;
 public class JpaAuditingConfiguration {
 
     private static final ThreadLocal<UUID> currentUserId = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> lookupInProgress = new ThreadLocal<>();
 
     @Bean
     public AuditorAware<UUID> auditorProvider(UserRepository userRepository) {
@@ -32,6 +33,7 @@ public class JpaAuditingConfiguration {
 
     public static void clearCurrentUserId() {
         currentUserId.remove();
+        lookupInProgress.remove();
     }
 
     @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -41,27 +43,44 @@ public class JpaAuditingConfiguration {
         @NotNull
         @Override
         public Optional<UUID> getCurrentAuditor() {
-            // First check ThreadLocal for manually set userId (for permitAll endpoints)
+            // First check ThreadLocal for manually set userId
             UUID threadLocalUserId = currentUserId.get();
             if (threadLocalUserId != null) {
                 return Optional.of(threadLocalUserId);
             }
 
-            // Then check SecurityContext for authenticated user
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            
-            if (authentication == null || !authentication.isAuthenticated()) {
+            // Prevent infinite recursion
+            if (Boolean.TRUE.equals(lookupInProgress.get())) {
                 return Optional.empty();
             }
-            
-            String username = authentication.getName();
-            if (username == null || username.isBlank()) {
-                return Optional.empty();
-            }
-            
-            return userRepository.findByUsername(username)
+
+            try {
+                lookupInProgress.set(true);
+
+                // Get authentication from SecurityContext
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+                if (authentication == null || !authentication.isAuthenticated()) {
+                    return Optional.empty();
+                }
+
+                String username = authentication.getName();
+                if (username == null || username.isBlank() || "anonymousUser".equals(username)) {
+                    return Optional.empty();
+                }
+
+                // Look up user and cache the result
+                Optional<UUID> userId = userRepository.findByUsername(username)
                     .map(User::getId);
+
+                // Cache the userId for subsequent auditing calls in the same transaction
+                userId.ifPresent(currentUserId::set);
+
+                return userId;
+
+            } finally {
+                lookupInProgress.remove();
+            }
         }
     }
 }
-

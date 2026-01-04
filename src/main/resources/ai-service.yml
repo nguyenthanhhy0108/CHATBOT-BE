@@ -1,0 +1,4 @@
+rag:
+  hippo:
+    api:
+      url: https://mmlab.uit.edu.vn/demo/rag/api/agent/chat

@@ -2,6 +2,7 @@ package com.example.be.model.dto.facade.response;
 
 import com.example.be.model.entity.SenderType;
 import com.example.be.model.standard.BaseResponseDto;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class ChatMessageHistoryItem extends BaseResponseDto {
   private String message;
 
   private SenderType senderType;
+
+  private List<String> urls;
 }
 
 
